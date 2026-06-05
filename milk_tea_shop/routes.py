@@ -460,36 +460,8 @@ def add_product():
     if not check_admin():
         return redirect(url_for("main.login"))
 
-    if request.method == "POST":
-        name = request.form.get("name", "").strip()
-        category = request.form.get("category", "Trà sữa").strip()
-        size = request.form.get("size", "M/L").strip()
-        topping = request.form.get("topping", "Không").strip()
-        price = request.form.get("price", type=int)
-        description = request.form.get("description", "").strip()
-        image = save_image(request.files.get("image"))
-
-        if name == "" or not price or price < 0:
-            flash("Vui lòng nhập tên món và giá hợp lệ.", "warning")
-            return redirect(url_for("main.add_product"))
-
-        new_product = Product(
-            name=name,
-            category=category,
-            size=size,
-            topping=topping,
-            price=price,
-            description=description,
-            image=image
-        )
-
-        db.session.add(new_product)
-        db.session.commit()
-
-        flash("Thêm món thành công.", "success")
-        return redirect(url_for("main.admin_products"))
-
-    return render_template("add_product.html", categories=CATEGORIES[1:])
+    flash("Tính năng thêm món đang phát triển.", "info")
+    return redirect(url_for("main.admin_products"))
 
 @main_bp.route("/admin/products/edit/<int:product_id>", methods=["GET", "POST"])
 def edit_product(product_id):
@@ -529,3 +501,11 @@ def order_list():
 
     orders = Order.query.order_by(Order.created_at.desc()).all()
     return render_template("order_list.html", orders=orders, status_list=ORDER_STATUS)
+
+@main_bp.route("/admin/orders/<int:order_id>/status", methods=["POST"])
+def update_order_status(order_id):
+    if not check_admin():
+        return redirect(url_for("main.login"))
+
+    flash("Tính năng cập nhật trạng thái đang phát triển.", "info")
+    return redirect(url_for("main.order_list"))
