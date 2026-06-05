@@ -529,20 +529,3 @@ def order_list():
 
     orders = Order.query.order_by(Order.created_at.desc()).all()
     return render_template("order_list.html", orders=orders, status_list=ORDER_STATUS)
-
-@main_bp.route("/admin/orders/<int:order_id>/status", methods=["POST"])
-def update_order_status(order_id):
-    if not check_admin():
-        return redirect(url_for("main.login"))
-
-    order = Order.query.get_or_404(order_id)
-    status = request.form.get("status", "Chờ xác nhận")
-
-    if status in ORDER_STATUS:
-        order.status = status
-        db.session.commit()
-        flash("Đã cập nhật trạng thái đơn hàng.", "success")
-    else:
-        flash("Trạng thái không hợp lệ.", "danger")
-
-    return redirect(url_for("main.order_list"))

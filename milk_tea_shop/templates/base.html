@@ -41,19 +41,6 @@
                     </li>
 
                     {% elif session.get('role') == 'user' %}
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.menu') }}">Tất cả</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.menu', category='Trà sữa') }}">Trà sữa</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.menu', category='Topping') }}">Topping</a>
-                    </li>
-
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('main.cart') }}">
                             Giỏ hàng

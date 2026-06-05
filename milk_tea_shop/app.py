@@ -1,23 +1,17 @@
 import os
 from flask import Flask
 from werkzeug.security import generate_password_hash
-
 from config import Config
 from models import db, Product, User
 from routes import main_bp
-
-
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
     os.makedirs(app.config["IMAGE_FOLDER"], exist_ok=True)
     os.makedirs(app.instance_path, exist_ok=True)
-
     db.init_app(app)
     app.register_blueprint(main_bp)
-
     with app.app_context():
         db.create_all()
         update_database()
@@ -27,12 +21,10 @@ def create_app():
 
     return app
 
-
 def update_database():
     with db.engine.connect() as conn:
         columns = conn.exec_driver_sql("PRAGMA table_info(orders)").fetchall()
         column_names = [column[1] for column in columns]
-
         need_columns = {
             "customer_name": "VARCHAR(120) DEFAULT ''",
             "phone": "VARCHAR(30) DEFAULT ''",
@@ -40,23 +32,18 @@ def update_database():
             "note": "TEXT DEFAULT ''",
             "status": "VARCHAR(50) DEFAULT 'Chờ xác nhận'",
         }
-
         for name, data_type in need_columns.items():
             if name not in column_names:
                 conn.exec_driver_sql(f"ALTER TABLE orders ADD COLUMN {name} {data_type}")
-
         conn.commit()
-
 
 def add_sample_users():
     users = [
         ("admin", "admin123", "admin"),
         ("khach", "123456", "user"),
     ]
-
     for username, password, role in users:
         old_user = User.query.filter_by(username=username).first()
-
         if old_user is None:
             user = User(
                 username=username,
@@ -64,9 +51,7 @@ def add_sample_users():
                 role=role
             )
             db.session.add(user)
-
     db.session.commit()
-
 
 def add_sample_products():
     products = [
@@ -81,7 +66,6 @@ def add_sample_products():
         ["Trà sữa việt quất", "Trà hoa quả", "M/L", "Thạch trái cây", 39000, "Hương việt quất thơm nhẹ.", "Tra_sua_viet_quat.png"],
         ["Trà sữa bơ", "Sữa tươi", "M/L", "Kem cheese", 40000, "Vị bơ béo mịn.", "Tra_sua_bo.png"],
         ["Hồng trà machiato", "Trà hoa quả", "M/L", "Kem cheese", 35000, "Hồng trà kết hợp kem machiato.", "Hong_tra_machiato.png"],
-
         # MENU TOPPING
         ["Trân châu đen", "Topping", "Không", "Không", 5000, "Topping trân châu đen dai mềm.", "topping_tran_chau_duong_den.png"],
         ["Trân châu đường đen", "Topping", "Không", "Không", 8000, "Trân châu nấu với đường đen, vị ngọt thơm.", "topping_tran_chau_duong_den.png"],
@@ -109,9 +93,7 @@ def add_sample_products():
 
     db.session.commit()
 
-
 def fix_product_images():
-    # Sửa lại ảnh bị sai tên trong database cũ
     image_list = {
         "Trân châu đen": "topping_tran_chau_duong_den.png",
         "Trân châu đường đen": "topping_tran_chau_duong_den.png",
@@ -129,7 +111,6 @@ def fix_product_images():
             product.image = image_name
 
     db.session.commit()
-
 
 app = create_app()
 
