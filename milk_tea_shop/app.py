@@ -1,9 +1,11 @@
 import os
 from flask import Flask
 from werkzeug.security import generate_password_hash
+
 from config import Config
 from models import db, Product, User
 from routes import main_bp
+
 
 def create_app():
     app = Flask(__name__)
@@ -12,6 +14,7 @@ def create_app():
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
     os.makedirs(app.config["IMAGE_FOLDER"], exist_ok=True)
     os.makedirs(app.instance_path, exist_ok=True)
+
     db.init_app(app)
     app.register_blueprint(main_bp)
 
@@ -20,6 +23,7 @@ def create_app():
         update_database()
         add_sample_users()
         add_sample_products()
+        fix_product_images()
 
     return app
 
@@ -79,13 +83,13 @@ def add_sample_products():
         ["Hồng trà machiato", "Trà hoa quả", "M/L", "Kem cheese", 35000, "Hồng trà kết hợp kem machiato.", "Hong_tra_machiato.png"],
 
         # MENU TOPPING
-        ["Trân châu đen", "Topping", "Không", "Không", 5000, "Topping trân châu đen dai mềm.", "topping_tran_chau_den.png"],
+        ["Trân châu đen", "Topping", "Không", "Không", 5000, "Topping trân châu đen dai mềm.", "topping_tran_chau_duong_den.png"],
         ["Trân châu đường đen", "Topping", "Không", "Không", 8000, "Trân châu nấu với đường đen, vị ngọt thơm.", "topping_tran_chau_duong_den.png"],
         ["Thạch trái cây", "Topping", "Không", "Không", 6000, "Thạch trái cây nhiều màu, vị ngọt nhẹ.", "topping_thach_trai_cay.png"],
         ["Thạch matcha", "Topping", "Không", "Không", 7000, "Thạch matcha thơm nhẹ, hợp với trà sữa.", "topping_thach_matcha.png"],
         ["Thạch phô mai", "Topping", "Không", "Không", 8000, "Thạch phô mai béo nhẹ, ăn kèm trà sữa.", "topping_thach_pho_mai.png"],
         ["Sương sáo", "Topping", "Không", "Không", 6000, "Sương sáo thanh mát, mềm nhẹ.", "topping_suong_sao.png"],
-        ["Nha đam", "Topping", "Không", "Không", 6000, "Nha đam giòn mát, phù hợp với trà hoa quả.", "nha_dam.png"],
+        ["Nha đam", "Topping", "Không", "Không", 6000, "Nha đam giòn mát, phù hợp với trà hoa quả.", "topping_nha_dam.png"],
     ]
 
     for item in products:
@@ -102,6 +106,27 @@ def add_sample_products():
                 image=item[6]
             )
             db.session.add(product)
+
+    db.session.commit()
+
+
+def fix_product_images():
+    # Sửa lại ảnh bị sai tên trong database cũ
+    image_list = {
+        "Trân châu đen": "topping_tran_chau_duong_den.png",
+        "Trân châu đường đen": "topping_tran_chau_duong_den.png",
+        "Thạch trái cây": "topping_thach_trai_cay.png",
+        "Thạch matcha": "topping_thach_matcha.png",
+        "Thạch phô mai": "topping_thach_pho_mai.png",
+        "Sương sáo": "topping_suong_sao.png",
+        "Nha đam": "topping_nha_dam.png",
+    }
+
+    for product_name, image_name in image_list.items():
+        product = Product.query.filter_by(name=product_name).first()
+
+        if product:
+            product.image = image_name
 
     db.session.commit()
 
