@@ -1,8 +1,10 @@
 import os
 from datetime import datetime
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
+
 from models import db, User, Product, Order, OrderItem
 
 
@@ -27,7 +29,10 @@ def send_data_to_html():
     cart_count = 0
 
     for quantity in cart.values():
-        cart_count += int(quantity)
+        try:
+            cart_count += int(quantity)
+        except:
+            pass
 
     return {
         "money": money,
@@ -190,6 +195,9 @@ def menu():
 
     products = query.order_by(Product.id.desc()).all()
 
+    # Đẩy Topping xuống cuối danh sách
+    products.sort(key=lambda product: product.category == "Topping")
+
     return render_template(
         "menu.html",
         products=products,
@@ -213,9 +221,14 @@ def order(product_id):
         note = request.form.get("note", "").strip()
         quantity = request.form.get("quantity", 1, type=int)
 
-        if customer_name == "" or phone == "" or address == "":
-            flash("Vui lòng nhập họ tên, số điện thoại và địa chỉ.", "warning")
-            return redirect(url_for("main.order", product_id=product.id))
+        if customer_name == "":
+            customer_name = "Khách lẻ"
+
+        if phone == "":
+            phone = "Không có"
+
+        if address == "":
+            address = "Nhận tại quán"
 
         if quantity < 1:
             quantity = 1
@@ -370,9 +383,14 @@ def checkout_cart():
     address = request.form.get("address", "").strip()
     note = request.form.get("note", "").strip()
 
-    if customer_name == "" or phone == "" or address == "":
-        flash("Vui lòng nhập họ tên, số điện thoại và địa chỉ.", "warning")
-        return redirect(url_for("main.cart"))
+    if customer_name == "":
+        customer_name = "Khách lẻ"
+
+    if phone == "":
+        phone = "Không có"
+
+    if address == "":
+        address = "Nhận tại quán"
 
     total_price = 0
     cart_items = []
@@ -460,6 +478,10 @@ def admin_products():
         return redirect(url_for("main.login"))
 
     products = Product.query.order_by(Product.id.desc()).all()
+
+    # Đẩy Topping xuống cuối danh sách quản lý món
+    products.sort(key=lambda product: product.category == "Topping")
+
     return render_template("admin_products.html", products=products)
 
 
