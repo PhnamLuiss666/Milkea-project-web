@@ -1,14 +1,14 @@
 html, body {
-    min-height: 100%;
     margin: 0;
+    min-height: 100%;
 }
 
 body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    color: #2f2723;
     font-family: Arial, Helvetica, sans-serif;
+    color: #2f2723;
     background: #fffaf5;
 }
 
@@ -16,17 +16,15 @@ main {
     flex: 1;
 }
 
-/* Nền sau khi đăng nhập */
 body.app-body {
-    background: linear-gradient(rgba(255, 250, 245, 0.70), rgba(255, 250, 245, 0.70)),
+    background: linear-gradient(rgba(255,250,245,0.7), rgba(255,250,245,0.7)),
                 url("../images/background.png");
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
     background-attachment: fixed;
 }
 
-/* Nền trang đăng nhập / đăng ký */
+/* Nền trang đăng nhập */
 body.auth-body {
     background: #f7f1e6;
     overflow-x: hidden;
@@ -36,7 +34,7 @@ body.auth-body main > .container.mt-3 {
     display: none;
 }
 
-/* Màu dùng chung */
+/* Màu chung */
 .text-brown {
     color: #8a4f2a !important;
 }
@@ -45,61 +43,54 @@ body.auth-body main > .container.mt-3 {
     background: #8a4f2a !important;
 }
 
-.bg-brown-light {
-    background: #f3dfcf;
-}
-
 .btn-brown {
     background: #8a4f2a;
-    color: #fff;
+    color: white;
     border: 1px solid #8a4f2a;
 }
 
 .btn-brown:hover {
     background: #8a4f2a;
-    color: #fff;
+    color: white;
 }
 
 .btn-outline-brown {
     border: 1px solid #8a4f2a;
     color: #8a4f2a;
-    background: #fff;
+    background: white;
 }
 
 .btn-outline-brown:hover {
     border: 1px solid #8a4f2a;
     color: #8a4f2a;
-    background: #fff;
+    background: white;
 }
 
-/* Navbar */
-.navbar {
-    background-color: rgba(255, 255, 255, 0.88) !important;
+/* Navbar và footer */
+.navbar,
+footer {
+    background: rgba(255, 255, 255, 0.9) !important;
 }
 
-.nav-logo {
-    width: 45px;
-    height: 45px;
-    object-fit: contain;
-    border-radius: 50%;
-    background: #fff3e8;
-    padding: 4px;
-    box-shadow: none;
-}
-
-/* Footer */
 footer {
     margin-top: auto;
-    background-color: rgba(255, 255, 255, 0.88) !important;
 }
 
-/* Trang chủ */
-.hero-section {
+/* Các khối giao diện */
+.hero-section,
+.menu-hero,
+.page-header {
     background: rgba(255, 241, 223, 0.78);
 }
 
-.min-vh-50 {
-    min-height: 50vh;
+.hero-card,
+.auth-card,
+.stat-card,
+.search-box,
+.cart-checkout-box {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 24px;
+    padding: 28px;
 }
 
 .hero-logo {
@@ -108,60 +99,35 @@ footer {
     object-fit: contain;
 }
 
-.hero-card,
-.auth-card,
-.stat-card,
-.search-box {
-    background: rgba(255, 255, 255, 0.90);
-    border-radius: 24px;
-    padding: 28px;
-}
-
-/* =========================
-   ẢNH MENU TRÀ SỮA
-   ========================= */
-
+/* Card sản phẩm */
 .product-card {
     background: rgba(255, 255, 255, 0.94);
     border: none;
     border-radius: 22px;
     overflow: hidden;
     height: 100%;
-    box-shadow: none;
 }
 
 .product-card:hover {
     transform: none;
 }
 
-/* Khung ảnh cố định */
 .product-img-box {
     width: 100%;
     height: 260px;
     background: #fff3e8;
-    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
-/* Ảnh món */
 .product-img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    object-position: center;
-    padding: 0;
-    transform: none;
 }
 
-/* Nếu ảnh topping/logo quá to thì vẫn nằm trong khung */
-.product-img-box img {
-    max-width: 100%;
-    max-height: 100%;
-}
-
-/* Nội dung trong card */
 .product-card .card-body {
     padding: 18px;
 }
@@ -180,17 +146,6 @@ footer {
     font-weight: 800;
 }
 
-/* Header trang */
-.page-header,
-.menu-hero {
-    background: rgba(255, 241, 223, 0.78);
-}
-
-/* Form đăng nhập cũ nếu có */
-.auth-card {
-    max-width: 430px;
-}
-
 /* Ảnh trong bảng admin */
 .table-img {
     width: 70px;
@@ -201,21 +156,11 @@ footer {
     padding: 6px;
 }
 
-.stat-card {
-    background: #fff;
-    border-radius: 22px;
-    padding: 28px;
-}
-
-/* =========================
-   LOGIN PAGE
-   ========================= */
-
+/* Trang đăng nhập */
 .login-page {
     min-height: 100vh;
     width: 100%;
-    background: linear-gradient(rgba(247, 241, 230, 0.10), rgba(247, 241, 230, 0.10)),
-                url("../images/logo_bn.png");
+    background: url("../images/logo_bn.png");
     background-size: cover;
     background-position: center;
     display: flex;
@@ -227,37 +172,15 @@ footer {
 
 .login-left {
     width: 45%;
-    text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #006b68;
 }
 
 .login-big-logo {
     width: 1020px;
     height: 1020px;
     object-fit: contain;
-    margin-bottom: 20px;
-}
-
-.login-left h1 {
-    font-size: 72px;
-    font-weight: 900;
-    letter-spacing: 4px;
-    color: #00736f;
-    margin: 0;
-}
-
-.login-left h1 span {
-    color: #c9a85d;
-}
-
-.login-left h3 {
-    font-size: 36px;
-    font-weight: 800;
-    letter-spacing: 5px;
-    color: #00736f;
 }
 
 .login-box {
@@ -267,14 +190,12 @@ footer {
     outline: 3px solid #c9a85d;
     padding: 40px 35px;
     text-align: center;
-    box-shadow: none;
 }
 
 .login-box h2 {
     font-size: 46px;
     font-weight: 800;
     color: #00736f;
-    margin-bottom: 10px;
     font-family: cursive;
 }
 
@@ -298,7 +219,6 @@ footer {
 .input-group-custom .icon {
     width: 60px;
     font-size: 25px;
-    color: #00736f;
 }
 
 .input-group-custom input {
@@ -307,7 +227,6 @@ footer {
     outline: none;
     padding: 16px 12px;
     font-size: 20px;
-    background: transparent;
 }
 
 .login-btn {
@@ -319,12 +238,10 @@ footer {
     font-size: 24px;
     font-weight: 900;
     padding: 15px;
-    margin-top: 15px;
 }
 
 .login-btn:hover {
     background: #00736f;
-    transform: none;
 }
 
 .login-links {
@@ -338,18 +255,6 @@ footer {
     text-decoration: none;
     color: #00736f;
     font-size: 17px;
-    font-weight: 500;
-}
-
-.login-links a:hover {
-    text-decoration: none;
-}
-
-.login-demo {
-    background: rgba(0, 115, 111, 0.08);
-    border-radius: 10px;
-    padding: 10px 12px;
-    color: #005956;
 }
 
 .order-box {
@@ -358,12 +263,6 @@ footer {
 
 .cart-qty-input {
     width: 78px;
-}
-
-.cart-checkout-box {
-    background: #fff;
-    border-radius: 24px;
-    padding: 28px;
 }
 
 /* Responsive */
@@ -375,20 +274,11 @@ footer {
 
     .login-left {
         width: 100%;
-        margin-bottom: 20px;
     }
 
     .login-big-logo {
         width: 260px;
         height: 260px;
-    }
-
-    .login-left h1 {
-        font-size: 44px;
-    }
-
-    .login-left h3 {
-        font-size: 24px;
     }
 
     .login-box {
@@ -402,9 +292,5 @@ footer {
 
     .product-img-box {
         height: 220px;
-    }
-
-    .product-img {
-        transform: none;
     }
 }
