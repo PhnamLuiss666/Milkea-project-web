@@ -187,16 +187,22 @@ def menu():
 
     query = Product.query
 
+    # Tìm kiếm theo tên món
     if keyword != "":
         query = query.filter(Product.name.ilike(f"%{keyword}%"))
 
-    if category != "Tất cả":
-        query = query.filter(Product.category == category)
+    # Lọc theo loại
+    if category == "Trà sữa":
+        query = query.filter(Product.category == "Trà sữa")
+
+    elif category == "Topping":
+        query = query.filter(Product.category == "Topping")
 
     products = query.order_by(Product.id.desc()).all()
 
-    # Đẩy Topping xuống cuối danh sách
-    products.sort(key=lambda product: product.category == "Topping")
+    # Nếu chọn tất cả thì đẩy topping xuống cuối
+    if category == "Tất cả":
+        products.sort(key=lambda product: product.category == "Topping")
 
     return render_template(
         "menu.html",
