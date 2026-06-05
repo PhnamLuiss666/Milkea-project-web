@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import check_password_hash, generate_password_hash
+
 from models import db, User, Product, Order, OrderItem
 
 main_bp = Blueprint("main", __name__)
@@ -8,9 +9,6 @@ MAX_QUANTITY = 99
 CATEGORIES = ["Tất cả", "Trà sữa", "Topping"]
 
 
-# =========================
-# HÀM DÙNG CHUNG
-# =========================
 def money(number):
     return f"{number:,.0f}đ".replace(",", ".")
 
@@ -21,10 +19,7 @@ def send_data_to_html():
     cart_count = 0
 
     for quantity in cart.values():
-        try:
-            cart_count += int(quantity)
-        except:
-            pass
+        cart_count += int(quantity)
 
     return {
         "money": money,
@@ -56,9 +51,6 @@ def check_admin():
     return True
 
 
-# =========================
-# ĐĂNG NHẬP / ĐĂNG KÝ
-# =========================
 @main_bp.route("/")
 def index():
     if "user_id" not in session:
@@ -72,11 +64,6 @@ def index():
 
 @main_bp.route("/login", methods=["GET", "POST"])
 def login():
-    if "user_id" in session:
-        if session.get("role") == "admin":
-            return redirect(url_for("main.dashboard"))
-        return redirect(url_for("main.menu"))
-
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
@@ -88,13 +75,8 @@ def login():
             session["user_id"] = user.id
             session["username"] = user.username
             session["role"] = user.role
-
             flash("Đăng nhập thành công.", "success")
-
-            if user.role == "admin":
-                return redirect(url_for("main.dashboard"))
-
-            return redirect(url_for("main.menu"))
+            return redirect(url_for("main.index"))
 
         flash("Sai tài khoản hoặc mật khẩu.", "danger")
 
@@ -103,9 +85,6 @@ def login():
 
 @main_bp.route("/register", methods=["GET", "POST"])
 def register():
-    if "user_id" in session:
-        return redirect(url_for("main.index"))
-
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
@@ -120,7 +99,6 @@ def register():
             return redirect(url_for("main.register"))
 
         old_user = User.query.filter_by(username=username).first()
-
         if old_user:
             flash("Tên đăng nhập đã tồn tại.", "danger")
             return redirect(url_for("main.register"))
@@ -130,7 +108,6 @@ def register():
             password=generate_password_hash(password),
             role="user"
         )
-
         db.session.add(new_user)
         db.session.commit()
 
@@ -147,9 +124,6 @@ def logout():
     return redirect(url_for("main.login"))
 
 
-# =========================
-# KHÁCH HÀNG
-# =========================
 @main_bp.route("/menu")
 def menu():
     if not check_user():
@@ -203,11 +177,7 @@ def cart():
                 "item_total": item_total
             })
 
-    return render_template(
-        "cart.html",
-        cart_items=cart_items,
-        total_price=total_price
-    )
+    return render_template("cart.html", cart_items=cart_items, total_price=total_price)
 
 
 @main_bp.route("/cart/add/<int:product_id>", methods=["POST"])
@@ -216,14 +186,13 @@ def add_to_cart(product_id):
         return redirect(url_for("main.login"))
 
     product = Product.query.get_or_404(product_id)
-
-    cart = session.get("cart", {})
-    key = str(product.id)
-
     quantity = request.form.get("quantity", 1, type=int)
 
     if quantity < 1:
         quantity = 1
+
+    cart = session.get("cart", {})
+    key = str(product.id)
 
     old_quantity = int(cart.get(key, 0))
     new_quantity = old_quantity + quantity
@@ -248,7 +217,6 @@ def update_cart(product_id):
 
     cart = session.get("cart", {})
     key = str(product_id)
-
     quantity = request.form.get("quantity", 1, type=int)
 
     if quantity < 1:
@@ -293,7 +261,6 @@ def checkout_cart():
         return redirect(url_for("main.cart"))
 
     note = request.form.get("note", "").strip()
-
     total_price = 0
     cart_items = []
 
@@ -303,11 +270,7 @@ def checkout_cart():
         if product:
             quantity = int(quantity)
             total_price += product.price * quantity
-
-            cart_items.append({
-                "product": product,
-                "quantity": quantity
-            })
+            cart_items.append({"product": product, "quantity": quantity})
 
     new_order = Order(
         user_id=session.get("user_id"),
@@ -329,7 +292,6 @@ def checkout_cart():
             quantity=item["quantity"],
             price=item["product"].price
         )
-
         db.session.add(order_item)
 
     db.session.commit()
@@ -346,16 +308,10 @@ def my_orders():
     if not check_user():
         return redirect(url_for("main.login"))
 
-    orders = Order.query.filter_by(
-        user_id=session.get("user_id")
-    ).order_by(Order.created_at.desc()).all()
-
+    orders = Order.query.filter_by(user_id=session.get("user_id")).order_by(Order.created_at.desc()).all()
     return render_template("my_orders.html", orders=orders)
 
 
-# =========================
-# ADMIN
-# =========================
 @main_bp.route("/admin/dashboard")
 def dashboard():
     if not check_admin():
@@ -379,7 +335,6 @@ def admin_products():
         return redirect(url_for("main.login"))
 
     products = Product.query.order_by(Product.id.desc()).all()
-
     return render_template("admin_products.html", products=products)
 
 
@@ -389,5 +344,4 @@ def order_list():
         return redirect(url_for("main.login"))
 
     orders = Order.query.order_by(Order.created_at.desc()).all()
-
     return render_template("order_list.html", orders=orders)

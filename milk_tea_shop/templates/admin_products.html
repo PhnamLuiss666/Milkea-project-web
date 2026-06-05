@@ -2,12 +2,11 @@
 {% block title %}Quản lý món - Milkea{% endblock %}
 {% block content %}
 <section class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="fw-bold mb-1">Quản lý sản phẩm</h1>
-            <p class="text-muted mb-0">Chỉ tài khoản admin mới được thêm, sửa, xóa món.</p>
-        </div>
+    <div class="mb-4">
+        <h1 class="fw-bold mb-1">Danh sách sản phẩm</h1>
+        <p class="text-muted mb-0">Admin xem danh sách món hiện có.</p>
     </div>
+
     <div class="table-responsive shadow-sm rounded bg-white">
         <table class="table align-middle mb-0">
             <thead class="table-light">
@@ -21,14 +20,17 @@
             <tbody>
                 {% for p in products %}
                 <tr>
-                    <td><img src="{{ url_for('static', filename='images/' + (p.image or 'logo.png')) }}" class="table-img" alt="{{ p.name }}"></td>
+                    <td>
+                        <img src="{{ url_for('static', filename='images/' + (p.image or 'logo.png')) }}" class="table-img" alt="{{ p.name }}">
+                    </td>
                     <td class="fw-semibold">{{ p.name }}</td>
                     <td>{{ p.category }}</td>
-                    <td>{{ "{:,.0f}".format(p.price).replace(',', '.') }}đ</td>
-                    </td>
+                    <td>{{ money(p.price) }}</td>
                 </tr>
                 {% else %}
-                <tr><td colspan="5" class="text-center text-muted py-4">Chưa có sản phẩm.</td></tr>
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">Chưa có sản phẩm.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>

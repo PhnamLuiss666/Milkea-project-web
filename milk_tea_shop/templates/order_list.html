@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="fw-bold mb-1">Danh sách đơn hàng</h1>
-            <p class="text-muted mb-0">Tất cả đơn khách đặt sẽ tự động hiện ở đây cho admin xử lý.</p>
+            <p class="text-muted mb-0">Tất cả đơn khách đã đặt.</p>
         </div>
         <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-brown">Về dashboard</a>
     </div>
@@ -15,9 +15,9 @@
             <thead class="table-light">
                 <tr>
                     <th>Mã đơn</th>
-                    <th>Khách hàng</th>
-                    <th>Thông tin nhận hàng</th>
+                    <th>Tài khoản</th>
                     <th>Chi tiết món</th>
+                    <th>Ghi chú</th>
                     <th>Tổng tiền</th>
                     <th>Thời gian</th>
                     <th>Trạng thái</th>
@@ -27,39 +27,21 @@
                 {% for o in orders %}
                 <tr>
                     <td class="fw-bold">#{{ o.id }}</td>
-                    <td>
-                        <div>{{ o.user.username if o.user else 'Khách' }}</div>
-                        <small class="text-muted">TK đặt món</small>
-                    </td>
-                    <td>
-                        <div><strong>Tên:</strong> {{ o.customer_name or 'Chưa nhập' }}</div>
-                        <div><strong>SĐT:</strong> {{ o.phone or 'Chưa nhập' }}</div>
-                        <div><strong>Địa chỉ:</strong> {{ o.address or 'Chưa nhập' }}</div>
-                        {% if o.note %}
-                        <div><strong>Ghi chú:</strong> {{ o.note }}</div>
-                        {% endif %}
-                    </td>
+                    <td>{{ o.user.username if o.user else 'Khách' }}</td>
                     <td>
                         {% for item in o.items %}
-                            <div>{{ item.product.name }} x {{ item.quantity }}</div>
-                            <small class="text-muted">{{ "{:,.0f}".format(item.price).replace(',', '.') }}đ / món</small><br>
+                        <div>{{ item.product.name }} x {{ item.quantity }}</div>
                         {% endfor %}
                     </td>
-                    <td class="fw-bold text-brown">{{ "{:,.0f}".format(o.total_price).replace(',', '.') }}đ</td>
+                    <td>{{ o.note or 'Không có' }}</td>
+                    <td class="fw-bold text-brown">{{ money(o.total_price) }}</td>
                     <td>{{ o.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
-                    <td>
-                        <form method="POST" action="{{ url_for('main.update_order_status', order_id=o.id) }}">
-                            <select name="status" class="form-select form-select-sm mb-2">
-                                {% for st in status_list %}
-                                <option value="{{ st }}" {% if o.status == st %}selected{% endif %}>{{ st }}</option>
-                                {% endfor %}
-                            </select>
-                            <button class="btn btn-brown btn-sm" type="submit">Cập nhật</button>
-                        </form>
-                    </td>
+                    <td>{{ o.status }}</td>
                 </tr>
                 {% else %}
-                <tr><td colspan="7" class="text-center text-muted py-4">Chưa có đơn hàng.</td></tr>
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">Chưa có đơn hàng.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
