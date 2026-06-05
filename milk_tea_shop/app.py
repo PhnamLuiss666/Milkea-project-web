@@ -79,12 +79,12 @@ def add_sample_products():
         ["Hồng trà machiato", "Trà hoa quả", "M/L", "Kem cheese", 35000, "Hồng trà kết hợp kem machiato.", "Hong_tra_machiato.png"],
 
         # MENU TOPPING
-        ["Trân châu đen", "Topping", "Không", "Không", 5000, "Topping trân châu đen dai mềm.", "tran_chau_den.png"],
-        ["Trân châu đường đen", "Topping", "Không", "Không", 8000, "Trân châu nấu với đường đen, vị ngọt thơm.", "tran_chau_duong_den.png"],
-        ["Thạch trái cây", "Topping", "Không", "Không", 6000, "Thạch trái cây nhiều màu, vị ngọt nhẹ.", "thach_trai_cay.png"],
-        ["Thạch matcha", "Topping", "Không", "Không", 7000, "Thạch matcha thơm nhẹ, hợp với trà sữa.", "thach_matcha.png"],
-        ["Thạch phô mai", "Topping", "Không", "Không", 8000, "Thạch phô mai béo nhẹ, ăn kèm trà sữa.", "thach_pho_mai.png"],
-        ["Sương sáo", "Topping", "Không", "Không", 6000, "Sương sáo thanh mát, mềm nhẹ.", "suong_sao.png"],
+        ["Trân châu đen", "Topping", "Không", "Không", 5000, "Topping trân châu đen dai mềm.", "topping_tran_chau_den.png"],
+        ["Trân châu đường đen", "Topping", "Không", "Không", 8000, "Trân châu nấu với đường đen, vị ngọt thơm.", "topping_tran_chau_duong_den.png"],
+        ["Thạch trái cây", "Topping", "Không", "Không", 6000, "Thạch trái cây nhiều màu, vị ngọt nhẹ.", "topping_thach_trai_cay.png"],
+        ["Thạch matcha", "Topping", "Không", "Không", 7000, "Thạch matcha thơm nhẹ, hợp với trà sữa.", "topping_thach_matcha.png"],
+        ["Thạch phô mai", "Topping", "Không", "Không", 8000, "Thạch phô mai béo nhẹ, ăn kèm trà sữa.", "topping_thach_pho_mai.png"],
+        ["Sương sáo", "Topping", "Không", "Không", 6000, "Sương sáo thanh mát, mềm nhẹ.", "topping_suong_sao.png"],
         ["Nha đam", "Topping", "Không", "Không", 6000, "Nha đam giòn mát, phù hợp với trà hoa quả.", "nha_dam.png"],
     ]
 
