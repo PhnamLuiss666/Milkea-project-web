@@ -8,24 +8,7 @@
     </div>
 </section>
 
-<div class="container pb-4">
-    <form method="GET" action="{{ url_for('main.menu') }}" class="row g-2 align-items-center">
-        <div class="col-md-8">
-            <input type="text" name="keyword" value="{{ keyword }}" class="form-control" placeholder="Tìm món...">
-        </div>
-        <div class="col-md-2">
-            <select name="category" class="form-select">
-                {% for c in categories %}
-                <option value="{{ c }}" {% if selected_category == c %}selected{% endif %}>{{ c }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-2 d-grid">
-            <button class="btn btn-brown" type="submit">Tìm</button>
-        </div>
-    </form>
-
-    <div class="mt-3 d-flex gap-2 flex-wrap">
+<div class="mt-3 d-flex gap-2 flex-wrap">
         <a href="{{ url_for('main.menu') }}" class="btn btn-outline-brown">Tất cả</a>
         <a href="{{ url_for('main.menu', category='Trà sữa') }}" class="btn btn-outline-brown">Trà sữa</a>
         <a href="{{ url_for('main.menu', category='Topping') }}" class="btn btn-outline-brown">Topping</a>

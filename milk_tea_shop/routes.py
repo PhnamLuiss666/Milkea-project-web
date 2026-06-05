@@ -19,7 +19,10 @@ def send_data_to_html():
     cart_count = 0
 
     for quantity in cart.values():
-        cart_count += int(quantity)
+        try:
+            cart_count += int(quantity)
+        except:
+            pass
 
     return {
         "money": money,
@@ -64,6 +67,9 @@ def index():
 
 @main_bp.route("/login", methods=["GET", "POST"])
 def login():
+    if "user_id" in session:
+        return redirect(url_for("main.index"))
+
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
@@ -75,6 +81,7 @@ def login():
             session["user_id"] = user.id
             session["username"] = user.username
             session["role"] = user.role
+
             flash("Đăng nhập thành công.", "success")
             return redirect(url_for("main.index"))
 
@@ -85,6 +92,9 @@ def login():
 
 @main_bp.route("/register", methods=["GET", "POST"])
 def register():
+    if "user_id" in session:
+        return redirect(url_for("main.index"))
+
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
@@ -99,6 +109,7 @@ def register():
             return redirect(url_for("main.register"))
 
         old_user = User.query.filter_by(username=username).first()
+
         if old_user:
             flash("Tên đăng nhập đã tồn tại.", "danger")
             return redirect(url_for("main.register"))
@@ -108,6 +119,7 @@ def register():
             password=generate_password_hash(password),
             role="user"
         )
+
         db.session.add(new_user)
         db.session.commit()
 
@@ -177,7 +189,11 @@ def cart():
                 "item_total": item_total
             })
 
-    return render_template("cart.html", cart_items=cart_items, total_price=total_price)
+    return render_template(
+        "cart.html",
+        cart_items=cart_items,
+        total_price=total_price
+    )
 
 
 @main_bp.route("/cart/add/<int:product_id>", methods=["POST"])
@@ -270,7 +286,10 @@ def checkout_cart():
         if product:
             quantity = int(quantity)
             total_price += product.price * quantity
-            cart_items.append({"product": product, "quantity": quantity})
+            cart_items.append({
+                "product": product,
+                "quantity": quantity
+            })
 
     new_order = Order(
         user_id=session.get("user_id"),
@@ -308,7 +327,10 @@ def my_orders():
     if not check_user():
         return redirect(url_for("main.login"))
 
-    orders = Order.query.filter_by(user_id=session.get("user_id")).order_by(Order.created_at.desc()).all()
+    orders = Order.query.filter_by(
+        user_id=session.get("user_id")
+    ).order_by(Order.created_at.desc()).all()
+
     return render_template("my_orders.html", orders=orders)
 
 
@@ -335,6 +357,7 @@ def admin_products():
         return redirect(url_for("main.login"))
 
     products = Product.query.order_by(Product.id.desc()).all()
+
     return render_template("admin_products.html", products=products)
 
 
@@ -344,4 +367,5 @@ def order_list():
         return redirect(url_for("main.login"))
 
     orders = Order.query.order_by(Order.created_at.desc()).all()
+
     return render_template("order_list.html", orders=orders)
