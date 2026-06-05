@@ -33,13 +33,6 @@ def send_data_to_html():
     }
 
 
-def check_login():
-    if "user_id" not in session:
-        flash("Vui lòng đăng nhập trước.", "warning")
-        return False
-    return True
-
-
 def check_admin():
     if "user_id" not in session:
         flash("Vui lòng đăng nhập trước.", "warning")
@@ -441,9 +434,11 @@ def my_orders():
 def dashboard():
     if not check_admin():
         return redirect(url_for("main.login"))
+
     product_count = Product.query.count()
     order_count = Order.query.count()
     revenue = db.session.query(db.func.sum(Order.total_price)).scalar() or 0
+
     return render_template(
         "dashboard.html",
         product_count=product_count,
@@ -456,17 +451,11 @@ def dashboard():
 def admin_products():
     if not check_admin():
         return redirect(url_for("main.login"))
+
     products = Product.query.order_by(Product.id.desc()).all()
     products.sort(key=lambda product: product.category == "Topping")
 
     return render_template("admin_products.html", products=products)
-
-@main_bp.route("/admin/products/add", methods=["GET", "POST"])
-def add_product():
-    if not check_admin():
-        return redirect(url_for("main.login"))
-    flash("Tính năng thêm món đang phát triển.", "info")
-    return redirect(url_for("main.admin_products"))
 
 
 @main_bp.route("/admin/orders")
@@ -477,11 +466,3 @@ def order_list():
     orders = Order.query.order_by(Order.created_at.desc()).all()
 
     return render_template("order_list.html", orders=orders, status_list=ORDER_STATUS)
-
-@main_bp.route("/admin/orders/<int:order_id>/status", methods=["POST"])
-def update_order_status(order_id):
-    if not check_admin():
-        return redirect(url_for("main.login"))
-
-    flash("Tính năng cập nhật trạng thái đang phát triển.", "info")
-    return redirect(url_for("main.order_list"))
