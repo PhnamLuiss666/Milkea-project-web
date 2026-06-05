@@ -38,7 +38,6 @@ def save_image(file):
         file_path = os.path.join(current_app.config["IMAGE_FOLDER"], new_name)
         file.save(file_path)
         return new_name
-
     return ""
 
 def check_login():
