@@ -6,11 +6,10 @@ main_bp = Blueprint("main", __name__)
 
 MAX_QUANTITY = 99
 CATEGORIES = ["Tất cả", "Trà sữa", "Topping"]
-ORDER_STATUS = ["Chờ xác nhận", "Đang làm", "Đang giao", "Hoàn thành", "Đã hủy"]
 
 
 # =========================
-# HÀM NHỎ DÙNG CHUNG
+# HÀM DÙNG CHUNG
 # =========================
 def money(number):
     return f"{number:,.0f}đ".replace(",", ".")
@@ -33,18 +32,6 @@ def send_data_to_html():
     }
 
 
-def check_admin():
-    if "user_id" not in session:
-        flash("Vui lòng đăng nhập trước.", "warning")
-        return False
-
-    if session.get("role") != "admin":
-        flash("Bạn không có quyền truy cập trang quản lý.", "danger")
-        return False
-
-    return True
-
-
 def check_user():
     if "user_id" not in session:
         flash("Vui lòng đăng nhập trước.", "warning")
@@ -52,6 +39,18 @@ def check_user():
 
     if session.get("role") == "admin":
         flash("Admin chỉ dùng trang quản lý.", "warning")
+        return False
+
+    return True
+
+
+def check_admin():
+    if "user_id" not in session:
+        flash("Vui lòng đăng nhập trước.", "warning")
+        return False
+
+    if session.get("role") != "admin":
+        flash("Bạn không có quyền truy cập trang quản lý.", "danger")
         return False
 
     return True
@@ -105,9 +104,7 @@ def login():
 @main_bp.route("/register", methods=["GET", "POST"])
 def register():
     if "user_id" in session:
-        if session.get("role") == "admin":
-            return redirect(url_for("main.dashboard"))
-        return redirect(url_for("main.menu"))
+        return redirect(url_for("main.index"))
 
     if request.method == "POST":
         username = request.form.get("username", "").strip()
@@ -115,15 +112,18 @@ def register():
         confirm_password = request.form.get("confirm_password", "")
 
         if username == "" or password == "" or confirm_password == "":
-            return render_template("register.html", error="Vui lòng nhập đầy đủ thông tin.")
+            flash("Vui lòng nhập đầy đủ thông tin.", "danger")
+            return redirect(url_for("main.register"))
 
         if password != confirm_password:
-            return render_template("register.html", error="Mật khẩu nhập lại không khớp.")
+            flash("Mật khẩu nhập lại không khớp.", "danger")
+            return redirect(url_for("main.register"))
 
         old_user = User.query.filter_by(username=username).first()
 
         if old_user:
-            return render_template("register.html", error="Tên đăng nhập đã tồn tại.")
+            flash("Tên đăng nhập đã tồn tại.", "danger")
+            return redirect(url_for("main.register"))
 
         new_user = User(
             username=username,
@@ -163,11 +163,8 @@ def menu():
     if keyword != "":
         query = query.filter(Product.name.ilike(f"%{keyword}%"))
 
-    if category == "Trà sữa":
-        query = query.filter(Product.category == "Trà sữa")
-
-    elif category == "Topping":
-        query = query.filter(Product.category == "Topping")
+    if category != "Tất cả":
+        query = query.filter(Product.category == category)
 
     products = query.order_by(Product.id.desc()).all()
 
@@ -181,66 +178,6 @@ def menu():
         keyword=keyword,
         selected_category=category
     )
-
-
-@main_bp.route("/order/<int:product_id>", methods=["GET", "POST"])
-def order(product_id):
-    if not check_user():
-        return redirect(url_for("main.login"))
-
-    product = Product.query.get_or_404(product_id)
-
-    if request.method == "POST":
-        customer_name = request.form.get("customer_name", "").strip()
-        phone = request.form.get("phone", "").strip()
-        address = request.form.get("address", "").strip()
-        note = request.form.get("note", "").strip()
-        quantity = request.form.get("quantity", 1, type=int)
-
-        if customer_name == "":
-            customer_name = "Khách lẻ"
-
-        if phone == "":
-            phone = "Không có"
-
-        if address == "":
-            address = "Nhận tại quán"
-
-        if quantity < 1:
-            quantity = 1
-
-        if quantity > MAX_QUANTITY:
-            quantity = MAX_QUANTITY
-
-        total_price = product.price * quantity
-
-        new_order = Order(
-            user_id=session.get("user_id"),
-            customer_name=customer_name,
-            phone=phone,
-            address=address,
-            note=note,
-            total_price=total_price,
-            status="Chờ xác nhận"
-        )
-
-        db.session.add(new_order)
-        db.session.flush()
-
-        order_item = OrderItem(
-            order_id=new_order.id,
-            product_id=product.id,
-            quantity=quantity,
-            price=product.price
-        )
-
-        db.session.add(order_item)
-        db.session.commit()
-
-        flash("Đặt món thành công! Tổng tiền: " + money(total_price), "success")
-        return redirect(url_for("main.my_orders"))
-
-    return render_template("order.html", product=product)
 
 
 @main_bp.route("/cart")
@@ -266,7 +203,11 @@ def cart():
                 "item_total": item_total
             })
 
-    return render_template("cart.html", cart_items=cart_items, total_price=total_price)
+    return render_template(
+        "cart.html",
+        cart_items=cart_items,
+        total_price=total_price
+    )
 
 
 @main_bp.route("/cart/add/<int:product_id>", methods=["POST"])
@@ -276,19 +217,16 @@ def add_to_cart(product_id):
 
     product = Product.query.get_or_404(product_id)
 
-    if "cart" not in session:
-        session["cart"] = {}
-
-    cart = session["cart"]
+    cart = session.get("cart", {})
     key = str(product.id)
 
+    quantity = request.form.get("quantity", 1, type=int)
+
+    if quantity < 1:
+        quantity = 1
+
     old_quantity = int(cart.get(key, 0))
-    add_quantity = request.form.get("quantity", 1, type=int)
-
-    if add_quantity < 1:
-        add_quantity = 1
-
-    new_quantity = old_quantity + add_quantity
+    new_quantity = old_quantity + quantity
 
     if new_quantity > MAX_QUANTITY:
         new_quantity = MAX_QUANTITY
@@ -354,19 +292,7 @@ def checkout_cart():
         flash("Giỏ hàng đang trống.", "warning")
         return redirect(url_for("main.cart"))
 
-    customer_name = request.form.get("customer_name", "").strip()
-    phone = request.form.get("phone", "").strip()
-    address = request.form.get("address", "").strip()
     note = request.form.get("note", "").strip()
-
-    if customer_name == "":
-        customer_name = "Khách lẻ"
-
-    if phone == "":
-        phone = "Không có"
-
-    if address == "":
-        address = "Nhận tại quán"
 
     total_price = 0
     cart_items = []
@@ -376,8 +302,7 @@ def checkout_cart():
 
         if product:
             quantity = int(quantity)
-            item_total = product.price * quantity
-            total_price += item_total
+            total_price += product.price * quantity
 
             cart_items.append({
                 "product": product,
@@ -386,9 +311,9 @@ def checkout_cart():
 
     new_order = Order(
         user_id=session.get("user_id"),
-        customer_name=customer_name,
-        phone=phone,
-        address=address,
+        customer_name=session.get("username"),
+        phone="",
+        address="",
         note=note,
         total_price=total_price,
         status="Chờ xác nhận"
@@ -404,6 +329,7 @@ def checkout_cart():
             quantity=item["quantity"],
             price=item["product"].price
         )
+
         db.session.add(order_item)
 
     db.session.commit()
@@ -453,7 +379,6 @@ def admin_products():
         return redirect(url_for("main.login"))
 
     products = Product.query.order_by(Product.id.desc()).all()
-    products.sort(key=lambda product: product.category == "Topping")
 
     return render_template("admin_products.html", products=products)
 
@@ -465,4 +390,4 @@ def order_list():
 
     orders = Order.query.order_by(Order.created_at.desc()).all()
 
-    return render_template("order_list.html", orders=orders, status_list=ORDER_STATUS)
+    return render_template("order_list.html", orders=orders)
