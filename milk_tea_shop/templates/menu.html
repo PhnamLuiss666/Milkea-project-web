@@ -21,16 +21,6 @@
             >
         </div>
 
-        <div class="col-md-2">
-            <select name="category" class="form-select">
-                {% for c in categories %}
-                <option value="{{ c }}" {% if selected_category == c %}selected{% endif %}>
-                    {{ c }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-
         <div class="col-md-2 d-grid">
             <button class="btn btn-brown" type="submit">Tìm</button>
         </div>
