@@ -1,0 +1,34 @@
+2e3b697  save toan bộ nội dung
+82a267a cap nhat code
+fbbc94d  xoá các dòng thừa
+da258b2  sửa lỗi tìm kiếm cho thanh tìm kiếm và thiết kế nút có thể bấm
+6fc11d6 cap nhat code
+625b7b0 khoi phuc crud san pham va tim kiem loc menu
+d9bdc68 xoa file
+5316df6  soát lỗi
+3f34fab  Sửa lại các tính năng tối ưu và xoá các chỗ không cần thiết
+47151f8 Cập nhật code
+d431296 xoa cac phan bi loi va
+497110d cap nhat code
+03054e2 cap nhat code
+af16d99 cap nhat tat ca file
+be2b3a4 cap nhat code
+35d20b7 cap nhat sua loi file app.py bị lỗi đè
+36197a7 cap nhat tat ca file
+f02e3da toi uu lai dong code xoá khoang trống
+f01e5c2 Sua loi hien thi hinh anh
+b4fa69b save all project files
+f7ac812 Giai quyet conflict va bo qua file cache
+c9eaf79 Thêm ảnh các topping và sửa lại thay thế toàn bộ logo.png tạm
+4dd1487 Vá lỗi hiển thị html và routes
+148e2e7 update flask project
+a6693b7 đẩy topping xuống cuối danh sách
+4ad6317 Delete .vscode directory
+28c8ccc Update app.py
+938ab37 Thêm toàn bộ tên giá tiền topping
+49d107a fix lỗi hiển thị topping
+ad3a0fd Thêm tính năng menu topping
+bcda881 Delete milk_tea_shop/__pycache__ directory
+03f4b9d Merge branch 'main' of https://github.com/PhnamLuiss666/Milkea-project-web
+c2d59e4 Initial commit
+4558f8a Initial commit
