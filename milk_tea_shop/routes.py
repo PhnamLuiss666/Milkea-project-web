@@ -1,34 +1,26 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import check_password_hash, generate_password_hash
-
 from models import db, User, Product, Order, OrderItem
-
 main_bp = Blueprint("main", __name__)
-
 MAX_QUANTITY = 99
 CATEGORIES = ["Tất cả", "Trà sữa", "Topping"]
 
-
 def money(number):
     return f"{number:,.0f}đ".replace(",", ".")
-
 
 @main_bp.app_context_processor
 def send_data_to_html():
     cart = session.get("cart", {})
     cart_count = 0
-
     for quantity in cart.values():
         try:
             cart_count += int(quantity)
         except:
             pass
-
     return {
         "money": money,
         "cart_count": cart_count
     }
-
 
 def check_user():
     if "user_id" not in session:
@@ -41,7 +33,6 @@ def check_user():
 
     return True
 
-
 def check_admin():
     if "user_id" not in session:
         flash("Vui lòng đăng nhập trước.", "warning")
@@ -52,7 +43,6 @@ def check_admin():
         return False
 
     return True
-
 
 # =========================
 # ĐĂNG NHẬP / ĐĂNG KÝ
@@ -66,7 +56,6 @@ def index():
         return redirect(url_for("main.dashboard"))
 
     return redirect(url_for("main.menu"))
-
 
 @main_bp.route("/login", methods=["GET", "POST"])
 def login():
@@ -91,7 +80,6 @@ def login():
         flash("Sai tài khoản hoặc mật khẩu.", "danger")
 
     return render_template("login.html")
-
 
 @main_bp.route("/register", methods=["GET", "POST"])
 def register():
@@ -131,13 +119,11 @@ def register():
 
     return render_template("register.html")
 
-
 @main_bp.route("/logout")
 def logout():
     session.clear()
     flash("Bạn đã đăng xuất.", "info")
     return redirect(url_for("main.login"))
-
 
 # =========================
 # KHÁCH HÀNG
@@ -149,7 +135,6 @@ def menu():
 
     keyword = request.args.get("keyword", "").strip()
     category = request.args.get("category", "Tất cả")
-
     query = Product.query
 
     if keyword != "":
@@ -171,24 +156,19 @@ def menu():
         selected_category=category
     )
 
-
 @main_bp.route("/cart")
 def cart():
     if not check_user():
         return redirect(url_for("main.login"))
-
     cart = session.get("cart", {})
     cart_items = []
     total_price = 0
-
     for product_id, quantity in cart.items():
         product = Product.query.get(int(product_id))
-
         if product:
             quantity = int(quantity)
             item_total = product.price * quantity
             total_price += item_total
-
             cart_items.append({
                 "product": product,
                 "quantity": quantity,
@@ -200,7 +180,6 @@ def cart():
         cart_items=cart_items,
         total_price=total_price
     )
-
 
 @main_bp.route("/cart/add/<int:product_id>", methods=["POST"])
 def add_to_cart(product_id):
@@ -228,7 +207,6 @@ def add_to_cart(product_id):
     cart[key] = new_quantity
     session["cart"] = cart
     session.modified = True
-
     return redirect(url_for("main.menu"))
 
 @main_bp.route("/cart/update/<int:product_id>", methods=["POST"])
@@ -239,33 +217,25 @@ def update_cart(product_id):
     cart = session.get("cart", {})
     key = str(product_id)
     quantity = request.form.get("quantity", 1, type=int)
-
     if quantity < 1:
         quantity = 1
-
     if quantity > MAX_QUANTITY:
         quantity = MAX_QUANTITY
-
     if key in cart:
         cart[key] = quantity
         session["cart"] = cart
         session.modified = True
         flash("Đã cập nhật giỏ hàng.", "success")
-
     return redirect(url_for("main.cart"))
-
 
 @main_bp.route("/cart/remove/<int:product_id>", methods=["POST"])
 def remove_from_cart(product_id):
     if not check_user():
         return redirect(url_for("main.login"))
-
     cart = session.get("cart", {})
     cart.pop(str(product_id), None)
-
     session["cart"] = cart
     session.modified = True
-
     flash("Đã xóa món khỏi giỏ hàng.", "success")
     return redirect(url_for("main.cart"))
 
@@ -273,24 +243,19 @@ def remove_from_cart(product_id):
 def checkout_cart():
     if not check_user():
         return redirect(url_for("main.login"))
-
     cart = session.get("cart", {})
-
     if not cart:
         flash("Giỏ hàng đang trống.", "warning")
         return redirect(url_for("main.cart"))
-
     note = request.form.get("note", "").strip()
     total_price = 0
     cart_items = []
 
     for product_id, quantity in cart.items():
         product = Product.query.get(int(product_id))
-
         if product:
             quantity = int(quantity)
             total_price += product.price * quantity
-
             cart_items.append({
                 "product": product,
                 "quantity": quantity
@@ -305,7 +270,6 @@ def checkout_cart():
         total_price=total_price,
         status="Chờ xác nhận"
     )
-
     db.session.add(new_order)
     db.session.flush()
 
@@ -317,12 +281,9 @@ def checkout_cart():
             price=item["product"].price
         )
         db.session.add(order_item)
-
     db.session.commit()
-
     session["cart"] = {}
     session.modified = True
-
     flash("Đặt hàng thành công! Tổng tiền: " + money(total_price), "success")
     return redirect(url_for("main.my_orders"))
 
@@ -334,7 +295,6 @@ def my_orders():
     orders = Order.query.filter_by(
         user_id=session.get("user_id")
     ).order_by(Order.created_at.desc()).all()
-
     return render_template("my_orders.html", orders=orders)
 
 # =========================
@@ -344,11 +304,9 @@ def my_orders():
 def dashboard():
     if not check_admin():
         return redirect(url_for("main.login"))
-
     product_count = Product.query.count()
     order_count = Order.query.count()
     revenue = db.session.query(db.func.sum(Order.total_price)).scalar() or 0
-
     return render_template(
         "dashboard.html",
         product_count=product_count,
@@ -360,16 +318,13 @@ def dashboard():
 def admin_products():
     if not check_admin():
         return redirect(url_for("main.login"))
-
     products = Product.query.order_by(Product.id.desc()).all()
-
     return render_template("admin_products.html", products=products)
 
 @main_bp.route("/admin/products/add", methods=["GET", "POST"])
 def add_product():
     if not check_admin():
         return redirect(url_for("main.login"))
-
     if request.method == "POST":
         name = request.form.get("name", "").strip()
         category = request.form.get("category", "Trà sữa").strip()
@@ -378,14 +333,11 @@ def add_product():
         price = request.form.get("price", type=int)
         description = request.form.get("description", "").strip()
         image = request.form.get("image", "").strip()
-
         if name == "" or price is None:
             flash("Vui lòng nhập tên món và giá.", "danger")
             return redirect(url_for("main.add_product"))
-
         if image == "":
             image = "logo.png"
-
         new_product = Product(
             name=name,
             category=category,
@@ -395,22 +347,17 @@ def add_product():
             description=description,
             image=image
         )
-
         db.session.add(new_product)
         db.session.commit()
-
         flash("Thêm sản phẩm thành công.", "success")
         return redirect(url_for("main.admin_products"))
-
     return render_template("add_product.html", categories=CATEGORIES[1:])
 
 @main_bp.route("/admin/products/edit/<int:product_id>", methods=["GET", "POST"])
 def edit_product(product_id):
     if not check_admin():
         return redirect(url_for("main.login"))
-
     product = Product.query.get_or_404(product_id)
-
     if request.method == "POST":
         product.name = request.form.get("name", "").strip()
         product.category = request.form.get("category", "Trà sữa").strip()
@@ -419,12 +366,9 @@ def edit_product(product_id):
         product.price = request.form.get("price", type=int) or product.price
         product.description = request.form.get("description", "").strip()
         product.image = request.form.get("image", "").strip() or "logo.png"
-
         db.session.commit()
-
         flash("Cập nhật sản phẩm thành công.", "success")
         return redirect(url_for("main.admin_products"))
-
     return render_template(
         "edit_product.html",
         product=product,
@@ -436,12 +380,9 @@ def edit_product(product_id):
 def delete_product(product_id):
     if not check_admin():
         return redirect(url_for("main.login"))
-
     product = Product.query.get_or_404(product_id)
-
     db.session.delete(product)
     db.session.commit()
-
     flash("Đã xoá sản phẩm.", "success")
     return redirect(url_for("main.admin_products"))
 
