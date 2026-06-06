@@ -231,7 +231,6 @@ def add_to_cart(product_id):
 
     return redirect(url_for("main.menu"))
 
-
 @main_bp.route("/cart/update/<int:product_id>", methods=["POST"])
 def update_cart(product_id):
     if not check_user():
@@ -269,7 +268,6 @@ def remove_from_cart(product_id):
 
     flash("Đã xóa món khỏi giỏ hàng.", "success")
     return redirect(url_for("main.cart"))
-
 
 @main_bp.route("/cart/checkout", methods=["POST"])
 def checkout_cart():
@@ -328,7 +326,6 @@ def checkout_cart():
     flash("Đặt hàng thành công! Tổng tiền: " + money(total_price), "success")
     return redirect(url_for("main.my_orders"))
 
-
 @main_bp.route("/my-orders")
 def my_orders():
     if not check_user():
@@ -339,7 +336,6 @@ def my_orders():
     ).order_by(Order.created_at.desc()).all()
 
     return render_template("my_orders.html", orders=orders)
-
 
 # =========================
 # ADMIN
@@ -360,7 +356,6 @@ def dashboard():
         revenue=revenue
     )
 
-
 @main_bp.route("/admin/products")
 def admin_products():
     if not check_admin():
@@ -369,7 +364,6 @@ def admin_products():
     products = Product.query.order_by(Product.id.desc()).all()
 
     return render_template("admin_products.html", products=products)
-
 
 @main_bp.route("/admin/products/add", methods=["GET", "POST"])
 def add_product():
@@ -409,7 +403,6 @@ def add_product():
         return redirect(url_for("main.admin_products"))
 
     return render_template("add_product.html", categories=CATEGORIES[1:])
-
 
 @main_bp.route("/admin/products/edit/<int:product_id>", methods=["GET", "POST"])
 def edit_product(product_id):
@@ -452,12 +445,9 @@ def delete_product(product_id):
     flash("Đã xoá sản phẩm.", "success")
     return redirect(url_for("main.admin_products"))
 
-
 @main_bp.route("/admin/orders")
 def order_list():
     if not check_admin():
         return redirect(url_for("main.login"))
-
     orders = Order.query.order_by(Order.created_at.desc()).all()
-
     return render_template("order_list.html", orders=orders)
