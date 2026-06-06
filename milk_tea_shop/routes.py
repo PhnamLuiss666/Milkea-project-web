@@ -54,6 +54,9 @@ def check_admin():
     return True
 
 
+# =========================
+# ĐĂNG NHẬP / ĐĂNG KÝ
+# =========================
 @main_bp.route("/")
 def index():
     if "user_id" not in session:
@@ -136,6 +139,9 @@ def logout():
     return redirect(url_for("main.login"))
 
 
+# =========================
+# KHÁCH HÀNG
+# =========================
 @main_bp.route("/menu")
 def menu():
     if not check_user():
@@ -286,6 +292,7 @@ def checkout_cart():
         if product:
             quantity = int(quantity)
             total_price += product.price * quantity
+
             cart_items.append({
                 "product": product,
                 "quantity": quantity
@@ -334,6 +341,9 @@ def my_orders():
     return render_template("my_orders.html", orders=orders)
 
 
+# =========================
+# ADMIN
+# =========================
 @main_bp.route("/admin/dashboard")
 def dashboard():
     if not check_admin():
@@ -359,6 +369,88 @@ def admin_products():
     products = Product.query.order_by(Product.id.desc()).all()
 
     return render_template("admin_products.html", products=products)
+
+
+@main_bp.route("/admin/products/add", methods=["GET", "POST"])
+def add_product():
+    if not check_admin():
+        return redirect(url_for("main.login"))
+
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        category = request.form.get("category", "Trà sữa").strip()
+        size = request.form.get("size", "").strip()
+        topping = request.form.get("topping", "").strip()
+        price = request.form.get("price", type=int)
+        description = request.form.get("description", "").strip()
+        image = request.form.get("image", "").strip()
+
+        if name == "" or price is None:
+            flash("Vui lòng nhập tên món và giá.", "danger")
+            return redirect(url_for("main.add_product"))
+
+        if image == "":
+            image = "logo.png"
+
+        new_product = Product(
+            name=name,
+            category=category,
+            size=size,
+            topping=topping,
+            price=price,
+            description=description,
+            image=image
+        )
+
+        db.session.add(new_product)
+        db.session.commit()
+
+        flash("Thêm sản phẩm thành công.", "success")
+        return redirect(url_for("main.admin_products"))
+
+    return render_template("add_product.html", categories=CATEGORIES[1:])
+
+
+@main_bp.route("/admin/products/edit/<int:product_id>", methods=["GET", "POST"])
+def edit_product(product_id):
+    if not check_admin():
+        return redirect(url_for("main.login"))
+
+    product = Product.query.get_or_404(product_id)
+
+    if request.method == "POST":
+        product.name = request.form.get("name", "").strip()
+        product.category = request.form.get("category", "Trà sữa").strip()
+        product.size = request.form.get("size", "").strip()
+        product.topping = request.form.get("topping", "").strip()
+        product.price = request.form.get("price", type=int) or product.price
+        product.description = request.form.get("description", "").strip()
+        product.image = request.form.get("image", "").strip() or "logo.png"
+
+        db.session.commit()
+
+        flash("Cập nhật sản phẩm thành công.", "success")
+        return redirect(url_for("main.admin_products"))
+
+    return render_template(
+        "edit_product.html",
+        product=product,
+        categories=CATEGORIES[1:]
+    )
+
+
+@main_bp.route("/admin/products/delete/<int:product_id>", methods=["POST"])
+def delete_product(product_id):
+    if not check_admin():
+        return redirect(url_for("main.login"))
+
+    product = Product.query.get_or_404(product_id)
+
+    db.session.delete(product)
+    db.session.commit()
+
+    flash("Đã xoá sản phẩm.", "success")
+    return redirect(url_for("main.admin_products"))
 
 
 @main_bp.route("/admin/orders")

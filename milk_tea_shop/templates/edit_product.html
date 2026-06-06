@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Sửa sản phẩm - Milkea{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+    <div class="mb-4">
+        <h1 class="fw-bold mb-1">Sửa sản phẩm</h1>
+        <p class="text-muted mb-0">Cập nhật thông tin món.</p>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('main.edit_product', product_id=product.id) }}">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Tên món</label>
+                    <input type="text" name="name" class="form-control" value="{{ product.name }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Loại</label>
+                    <select name="category" class="form-select">
+                        {% for c in categories %}
+                        <option value="{{ c }}" {% if product.category == c %}selected{% endif %}>
+                            {{ c }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Size</label>
+                    <input type="text" name="size" class="form-control" value="{{ product.size }}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Topping</label>
+                    <input type="text" name="topping" class="form-control" value="{{ product.topping }}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Giá</label>
+                    <input type="number" name="price" class="form-control" min="0" value="{{ product.price }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Mô tả</label>
+                    <textarea name="description" class="form-control" rows="3">{{ product.description }}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Tên file ảnh</label>
+                    <input type="text" name="image" class="form-control" value="{{ product.image }}">
+                    <small class="text-muted">
+                        Ảnh phải có sẵn trong thư mục static/images. Không cần upload ảnh.
+                    </small>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-brown">Lưu thay đổi</button>
+                    <a href="{{ url_for('main.admin_products') }}" class="btn btn-outline-secondary">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

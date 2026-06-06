@@ -1,10 +1,17 @@
 {% extends "base.html" %}
-{% block title %}Quản lý món - Milkea{% endblock %}
+{% block title %}Quản lý sản phẩm - Milkea{% endblock %}
+
 {% block content %}
 <section class="container py-5">
-    <div class="mb-4">
-        <h1 class="fw-bold mb-1">Danh sách sản phẩm</h1>
-        <p class="text-muted mb-0">Admin xem danh sách món hiện có.</p>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">Quản lý sản phẩm</h1>
+            <p class="text-muted mb-0">Admin có thể thêm, sửa hoặc xoá sản phẩm.</p>
+        </div>
+
+        <a href="{{ url_for('main.add_product') }}" class="btn btn-brown">
+            + Thêm sản phẩm
+        </a>
     </div>
 
     <div class="table-responsive shadow-sm rounded bg-white">
@@ -14,22 +21,56 @@
                     <th>Ảnh</th>
                     <th>Tên món</th>
                     <th>Loại</th>
+                    <th>Size</th>
+                    <th>Topping</th>
                     <th>Giá</th>
+                    <th>Thao tác</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for p in products %}
                 <tr>
                     <td>
-                        <img src="{{ url_for('static', filename='images/' + (p.image or 'logo.png')) }}" class="table-img" alt="{{ p.name }}">
+                        <img 
+                            src="{{ url_for('static', filename='images/' + (p.image or 'logo.png')) }}" 
+                            class="table-img" 
+                            alt="{{ p.name }}"
+                        >
                     </td>
+
                     <td class="fw-semibold">{{ p.name }}</td>
                     <td>{{ p.category }}</td>
-                    <td>{{ money(p.price) }}</td>
+                    <td>{{ p.size }}</td>
+                    <td>{{ p.topping }}</td>
+                    <td class="fw-bold text-brown">{{ money(p.price) }}</td>
+
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a 
+                                href="{{ url_for('main.edit_product', product_id=p.id) }}" 
+                                class="btn btn-outline-brown btn-sm"
+                            >
+                                Sửa
+                            </a>
+
+                            <form 
+                                method="POST" 
+                                action="{{ url_for('main.delete_product', product_id=p.id) }}"
+                                onsubmit="return confirm('Bạn có chắc muốn xoá sản phẩm này không?');"
+                            >
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    Xoá
+                                </button>
+                            </form>
+                        </div>
+                    </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="4" class="text-center text-muted py-4">Chưa có sản phẩm.</td>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        Chưa có sản phẩm.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
